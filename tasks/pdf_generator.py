@@ -71,30 +71,28 @@ class CVPDFGenerator:
         # Agregar imagen de perfil si existe
         if self.datos.fotoperfil:
             try:
-                # Intentar usar .path primero (para archivos locales)
+                # Intentar obtener la URL del archivo (funciona con Azure Storage y archivos locales)
                 try:
-                    foto_path = self.datos.fotoperfil.path
-                    if os.path.exists(foto_path):
-                        img = Image(foto_path, width=1.2*inch, height=1.2*inch)
-                        left_col.append(img)
-                except (AttributeError, TypeError):
-                    # Si .path no funciona, usar .url (para Azure Storage)
-                    foto_url = self.datos.fotoperfil.url
-                    if foto_url:
-                        # Descargar imagen temporalmente de Azure
-                        temp_fd, temp_path = tempfile.mkstemp(suffix='.jpg')
-                        try:
-                            urllib.request.urlretrieve(foto_url, temp_path)
-                            img = Image(temp_path, width=1.2*inch, height=1.2*inch)
-                            left_col.append(img)
-                            # Guardar ruta temporal para limpiar después
-                            if not hasattr(self, 'temp_files'):
-                                self.temp_files = []
-                            self.temp_files.append(temp_path)
-                        except Exception as e:
-                            print(f"Error descargando imagen de Azure: {e}")
+                    # Si es Azure Storage, tendrá .url pero no .path
+                    if hasattr(self.datos.fotoperfil, 'url'):
+                        foto_url = self.datos.fotoperfil.url
+                        if foto_url and foto_url.strip():
+                            # Descargar imagen temporalmente
+                            temp_fd, temp_path = tempfile.mkstemp(suffix='.jpg')
                             os.close(temp_fd)
-                            os.unlink(temp_path)
+                            try:
+                                urllib.request.urlretrieve(foto_url, temp_path)
+                                img = Image(temp_path, width=1.2*inch, height=1.2*inch)
+                                left_col.append(img)
+                                # Guardar ruta temporal para limpiar después
+                                self.temp_files.append(temp_path)
+                            except Exception as e:
+                                print(f"Error descargando imagen de {foto_url}: {e}")
+                                if os.path.exists(temp_path):
+                                    os.unlink(temp_path)
+                except Exception as e:
+                    print(f"Error accediendo a foto de perfil: {e}")
+                    
             except Exception as e:
                 print(f"Error cargando foto de perfil: {e}")
         
@@ -237,19 +235,28 @@ class CVPDFGenerator:
             # Certificado
             if reco.certificado:
                 cert_name = os.path.basename(reco.certificado.name)
-                cert_path = reco.certificado.path
                 
-                # Añadir a lista para incrustar después
-                if os.path.exists(cert_path) and cert_path.lower().endswith('.pdf'):
-                    self.certificados_para_incrustar.append({
-                        'path': cert_path,
-                        'titulo': f"{reco.get_tiporeconocimiento_display()} - {reco.entidadpatrocinadora}"
-                    })
-                    self.story.append(Paragraph(
-                        f"<b>📎 Certificado:</b> {cert_name} (Incrustado abajo)",
-                        self.styles['Normal']
-                    ))
-                else:
+                # Obtener URL del certificado (funciona con Azure y archivos locales)
+                try:
+                    cert_url = reco.certificado.url
+                    
+                    # Verificar que sea un PDF
+                    if cert_url and cert_name.lower().endswith('.pdf'):
+                        self.certificados_para_incrustar.append({
+                            'url': cert_url,
+                            'titulo': f"{reco.get_tiporeconocimiento_display()} - {reco.entidadpatrocinadora}"
+                        })
+                        self.story.append(Paragraph(
+                            f"<b>📎 Certificado:</b> {cert_name} (Incrustado abajo)",
+                            self.styles['Normal']
+                        ))
+                    else:
+                        self.story.append(Paragraph(
+                            f"<b>📎 Certificado:</b> {cert_name}",
+                            self.styles['Normal']
+                        ))
+                except Exception as e:
+                    print(f"Error procesando certificado de reconocimiento: {e}")
                     self.story.append(Paragraph(
                         f"<b>📎 Certificado:</b> {cert_name}",
                         self.styles['Normal']
@@ -296,19 +303,28 @@ class CVPDFGenerator:
             # Certificado
             if curso.certificado:
                 cert_name = os.path.basename(curso.certificado.name)
-                cert_path = curso.certificado.path
                 
-                # Añadir a lista para incrustar después
-                if os.path.exists(cert_path) and cert_path.lower().endswith('.pdf'):
-                    self.certificados_para_incrustar.append({
-                        'path': cert_path,
-                        'titulo': f"Curso: {curso.nombrecurso}"
-                    })
-                    self.story.append(Paragraph(
-                        f"<b>📎 Certificado:</b> {cert_name} (Incrustado abajo)",
-                        self.styles['Normal']
-                    ))
-                else:
+                # Obtener URL del certificado (funciona con Azure y archivos locales)
+                try:
+                    cert_url = curso.certificado.url
+                    
+                    # Verificar que sea un PDF
+                    if cert_url and cert_name.lower().endswith('.pdf'):
+                        self.certificados_para_incrustar.append({
+                            'url': cert_url,
+                            'titulo': f"Curso: {curso.nombrecurso}"
+                        })
+                        self.story.append(Paragraph(
+                            f"<b>📎 Certificado:</b> {cert_name} (Incrustado abajo)",
+                            self.styles['Normal']
+                        ))
+                    else:
+                        self.story.append(Paragraph(
+                            f"<b>📎 Certificado:</b> {cert_name}",
+                            self.styles['Normal']
+                        ))
+                except Exception as e:
+                    print(f"Error procesando certificado de curso: {e}")
                     self.story.append(Paragraph(
                         f"<b>📎 Certificado:</b> {cert_name}",
                         self.styles['Normal']
@@ -429,6 +445,7 @@ class CVPDFGenerator:
     def _incrustar_certificados(self, pdf_principal_buffer):
         """
         Incrustra los PDFs de certificados al final del PDF principal
+        Funciona con rutas locales y URLs de Azure Storage
         """
         try:
             # Lector del PDF principal
@@ -441,21 +458,70 @@ class CVPDFGenerator:
             
             # Agregar los certificados
             for cert_info in self.certificados_para_incrustar:
-                cert_path = cert_info['path']
+                # Soportar tanto URLs como rutas (para compatibilidad)
+                cert_source = cert_info.get('url') or cert_info.get('path')
                 
-                if not os.path.exists(cert_path):
+                if not cert_source:
                     continue
                 
                 try:
-                    # Leer el PDF del certificado
-                    cert_reader = PdfReader(open(cert_path, 'rb'))
+                    cert_buffer = None
                     
-                    # Agregar todas las páginas del certificado
-                    for page_num in range(len(cert_reader.pages)):
-                        writer.add_page(cert_reader.pages[page_num])
+                    # Si es una URL (Azure Storage), descargar primero
+                    if cert_source.startswith('http'):
+                        temp_cert_path = None
+                        try:
+                            # Crear archivo temporal para el certificado
+                            temp_cert = tempfile.NamedTemporaryFile(delete=False, suffix='.pdf')
+                            temp_cert_path = temp_cert.name
+                            temp_cert.close()
+                            
+                            # Descargar el certificado desde Azure
+                            urllib.request.urlretrieve(cert_source, temp_cert_path)
+                            
+                            # Leer el PDF descargado
+                            with open(temp_cert_path, 'rb') as f:
+                                cert_buffer = BytesIO(f.read())
+                        
+                        except Exception as e:
+                            print(f"Error descargando certificado desde {cert_source}: {e}")
+                            continue
+                        
+                        finally:
+                            # Limpiar archivo temporal
+                            if temp_cert_path and os.path.exists(temp_cert_path):
+                                try:
+                                    os.remove(temp_cert_path)
+                                except:
+                                    pass
                     
+                    # Si es una ruta local, leer directamente
+                    elif os.path.exists(cert_source):
+                        with open(cert_source, 'rb') as f:
+                            cert_buffer = BytesIO(f.read())
+                    
+                    else:
+                        print(f"Certificado no accesible: {cert_source}")
+                        continue
+                    
+                    # Si se obtuvo el buffer, procesar el PDF
+                    if cert_buffer:
+                        try:
+                            cert_buffer.seek(0)
+                            cert_reader = PdfReader(cert_buffer)
+                            
+                            # Agregar todas las páginas del certificado
+                            for page_num in range(len(cert_reader.pages)):
+                                writer.add_page(cert_reader.pages[page_num])
+                            
+                            print(f"Certificado incrustado: {cert_info.get('titulo', 'Sin título')}")
+                        
+                        except Exception as e:
+                            print(f"Error procesando PDF de certificado: {e}")
+                            continue
+                
                 except Exception as e:
-                    print(f"Error leyendo certificado {cert_path}: {e}")
+                    print(f"Error procesando certificado: {e}")
                     continue
             
             # Crear un nuevo buffer con el PDF combinado
