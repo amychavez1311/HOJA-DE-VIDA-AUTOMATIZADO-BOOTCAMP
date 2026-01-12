@@ -151,9 +151,18 @@ if not DEBUG:
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# Azure Storage Configuration (opcional - reemplaza con tus valores)
+# Azure Storage Configuration
 AZURE_STORAGE_CONNECTION_STRING = os.environ.get('AZURE_STORAGE_CONNECTION_STRING', '')
 AZURE_STORAGE_CONTAINER_NAME = os.environ.get('AZURE_STORAGE_CONTAINER_NAME', 'certificados')
+AZURE_STORAGE_MEDIA_CONTAINER = os.environ.get('AZURE_STORAGE_MEDIA_CONTAINER', 'media')
+
+# Usar Azure Storage para archivos de medios en producción
+if not DEBUG and AZURE_STORAGE_CONNECTION_STRING:
+    DEFAULT_FILE_STORAGE = 'tasks.azure_blob_storage.AzureBlobStorage'
+    MEDIA_URL = f'https://{os.environ.get("AZURE_STORAGE_ACCOUNT_NAME", "")}.blob.core.windows.net/{AZURE_STORAGE_MEDIA_CONTAINER}/'
+else:
+    # En desarrollo, usar almacenamiento local
+    DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 
 LOGIN_URL = "/signin"
 # Default primary key field type
