@@ -356,10 +356,8 @@ class CVPDFGenerator:
                         self.styles['Normal']
                     ))
             
-                        self.styles['Normal']
-                    ))
-            
             self.story.append(Spacer(1, 0.15*inch))
+
         
         self.story.append(Spacer(1, 0.1*inch))
     
