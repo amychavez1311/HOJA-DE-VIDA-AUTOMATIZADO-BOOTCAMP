@@ -1,0 +1,98 @@
+# Entorno Virtual
+venv/
+env/
+ENV/
+.venv
+
+# Archivos de Base de Datos
+db.sqlite3
+*.sqlite3
+*.db
+
+# IDE y Editores
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+.env.local
+.env.*.local
+
+# Python
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Archivos de Medios (Uploads de usuarios)
+media/
+media/**/*
+!media/.gitkeep
+
+# Archivos de Configuración Sensible
+.env
+.env.local
+.env.*.local
+secrets.json
+
+# Archivos de Cache y Logs
+*.log
+*.pot
+.cache/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Archivos Temporales
+*.tmp
+*.temp
+tmp/
+temp/
+
+# Archivos del Sistema
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# Node (si usas npm/webpack)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Archivos de IDE específicos
+.vscode/settings.json
+.vscode/launch.json
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# MacOS
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Azure Storage
+.azure/

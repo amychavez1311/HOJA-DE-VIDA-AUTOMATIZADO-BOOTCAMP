@@ -1,0 +1,201 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">Crear/Editar Datos Personales</h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger" role="alert">
+                                {% for error in form.non_field_errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+
+                        <div class="row">
+                            <!-- Nombres y Apellidos -->
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="id_nombres" class="form-label">
+                                        Nombres <span class="text-danger">*</span>
+                                    </label>
+                                    {{ form.nombres }}
+                                    {% if form.nombres.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in form.nombres.errors %}{{ error }}{% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="id_apellidos" class="form-label">
+                                        Apellidos <span class="text-danger">*</span>
+                                    </label>
+                                    {{ form.apellidos }}
+                                    {% if form.apellidos.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in form.apellidos.errors %}{{ error }}{% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Cédula -->
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="id_numerocedula" class="form-label">
+                                        Número de Cédula <span class="text-danger">*</span>
+                                    </label>
+                                    {{ form.numerocedula }}
+                                    {% if form.numerocedula.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in form.numerocedula.errors %}{{ error }}{% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <!-- Sexo -->
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="id_sexo" class="form-label">Sexo</label>
+                                    {{ form.sexo }}
+                                    {% if form.sexo.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in form.sexo.errors %}{{ error }}{% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Nacimiento -->
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="id_fechanacimiento" class="form-label">Fecha de Nacimiento</label>
+                                    {{ form.fechanacimiento }}
+                                </div>
+                            </div>
+                            <!-- Nacionalidad -->
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="id_nacionalidad" class="form-label">Nacionalidad</label>
+                                    {{ form.nacionalidad }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Lugar de Nacimiento -->
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="id_lugarnacimiento" class="form-label">Lugar de Nacimiento</label>
+                                    {{ form.lugarnacimiento }}
+                                </div>
+                            </div>
+                            <!-- Estado Civil -->
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="id_estadocivil" class="form-label">Estado Civil</label>
+                                    {{ form.estadocivil }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Teléfono Convencional -->
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="id_telefonoconvencional" class="form-label">Teléfono Convencional</label>
+                                    {{ form.telefonoconvencional }}
+                                </div>
+                            </div>
+                            <!-- Teléfono Fijo -->
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="id_telefonofijo" class="form-label">Teléfono Fijo</label>
+                                    {{ form.telefonofijo }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Licencia de Conducir -->
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="id_licenciaconducir" class="form-label">Licencia de Conducir</label>
+                                    {{ form.licenciaconducir }}
+                                </div>
+                            </div>
+                            <!-- Sitio Web -->
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="id_sitioweb" class="form-label">Sitio Web</label>
+                                    {{ form.sitioweb }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Dirección Domiciliaria -->
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="id_direcciondomiciliaria" class="form-label">Dirección Domiciliaria</label>
+                                    {{ form.direcciondomiciliaria }}
+                                </div>
+                            </div>
+                            <!-- Dirección de Trabajo -->
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="id_direcciontrabajo" class="form-label">Dirección de Trabajo</label>
+                                    {{ form.direcciontrabajo }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Descripción del Perfil -->
+                        <div class="mb-3">
+                            <label for="id_descripcionperfil" class="form-label">Descripción del Perfil</label>
+                            {{ form.descripcionperfil }}
+                        </div>
+
+                        <!-- Foto de Perfil -->
+                        <div class="mb-3">
+                            <label for="id_fotoperfil" class="form-label">Foto de Perfil</label>
+                            {{ form.fotoperfil }}
+                        </div>
+
+                        <!-- Perfil Activo -->
+                        <div class="mb-3 form-check">
+                            {{ form.perfilactivo }}
+                            <label for="id_perfilactivo" class="form-check-label">Perfil Activo</label>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'mi_hoja_vida' %}" class="btn btn-secondary">Cancelar</a>
+                            <button type="submit" class="btn btn-primary">Guardar Datos Personales</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    textarea.form-control {
+        min-height: 80px;
+    }
+</style>
+{% endblock %}

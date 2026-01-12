@@ -1,0 +1,255 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
+                    <h3 class="mb-0">Hoja de Vida - {{ usuario.username }}</h3>
+                    <a href="{% url 'admin_hojas_vida' %}" class="btn btn-light btn-sm">
+                        <i class="bi bi-arrow-left"></i> Volver
+                    </a>
+                </div>
+                <div class="card-body">
+                    
+                    <!-- Información Personal -->
+                    <div class="section mb-4">
+                        <h3 class="text-danger">Datos Personales</h3>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Nombre:</strong> {{ datos.nombres }} {{ datos.apellidos }}</p>
+                                <p><strong>Cédula:</strong> {{ datos.numerocedula }}</p>
+                                <p><strong>Nacionalidad:</strong> {{ datos.nacionalidad }}</p>
+                                <p><strong>Sexo:</strong> {{ datos.get_sexo_display }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Email:</strong> {{ usuario.email }}</p>
+                                <p><strong>Teléfono Convencional:</strong> {{ datos.telefonoconvencional }}</p>
+                                <p><strong>Teléfono Fijo:</strong> {{ datos.telefonofijo }}</p>
+                                <p><strong>Sitio Web:</strong> 
+                                    {% if datos.sitioweb %}
+                                        <a href="{{ datos.sitioweb }}" target="_blank">{{ datos.sitioweb }}</a>
+                                    {% else %}
+                                        N/A
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <!-- Experiencia Laboral -->
+                    <div class="section mb-4">
+                        <h3 class="text-danger">Experiencia Laboral</h3>
+                        {% if experiencias %}
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Cargo</th>
+                                            <th>Empresa</th>
+                                            <th>Período</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for exp in experiencias %}
+                                            <tr>
+                                                <td>{{ exp.cargodesempenado }}</td>
+                                                <td>{{ exp.nombreempresa }}</td>
+                                                <td>
+                                                    {{ exp.fechainiciogestion|date:"M Y" }}
+                                                    {% if exp.fechafingestion %}
+                                                        - {{ exp.fechafingestion|date:"M Y" }}
+                                                    {% else %}
+                                                        - Presente
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <p class="text-muted">No hay experiencias laborales registradas.</p>
+                        {% endif %}
+                    </div>
+
+                    <hr>
+
+                    <!-- Reconocimientos -->
+                    <div class="section mb-4">
+                        <h3 class="text-danger">Reconocimientos</h3>
+                        {% if reconocimientos %}
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Tipo</th>
+                                            <th>Entidad</th>
+                                            <th>Fecha</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for reco in reconocimientos %}
+                                            <tr>
+                                                <td>{{ reco.get_tiporeconocimiento_display }}</td>
+                                                <td>{{ reco.entidadpatrocinadora }}</td>
+                                                <td>{{ reco.fechareconocimiento|date:"d M Y" }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <p class="text-muted">No hay reconocimientos registrados.</p>
+                        {% endif %}
+                    </div>
+
+                    <hr>
+
+                    <!-- Cursos -->
+                    <div class="section mb-4">
+                        <h3 class="text-danger">Cursos y Capacitaciones</h3>
+                        {% if cursos %}
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Curso</th>
+                                            <th>Entidad</th>
+                                            <th>Período</th>
+                                            <th>Horas</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for curso in cursos %}
+                                            <tr>
+                                                <td>{{ curso.nombrecurso }}</td>
+                                                <td>{{ curso.entidadpatrocinadora }}</td>
+                                                <td>
+                                                    {{ curso.fechainicio|date:"M Y" }}
+                                                    {% if curso.fechafin %}
+                                                        - {{ curso.fechafin|date:"M Y" }}
+                                                    {% endif %}
+                                                </td>
+                                                <td>{{ curso.totalhoras|default:"N/A" }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <p class="text-muted">No hay cursos registrados.</p>
+                        {% endif %}
+                    </div>
+
+                    <hr>
+
+                    <!-- Productos Académicos -->
+                    <div class="section mb-4">
+                        <h3 class="text-danger">Productos Académicos</h3>
+                        {% if productos_academicos %}
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Recurso</th>
+                                            <th>Clasificador</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for prod in productos_academicos %}
+                                            <tr>
+                                                <td>{{ prod.nombrerecurso }}</td>
+                                                <td>{{ prod.clasificador }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <p class="text-muted">No hay productos académicos registrados.</p>
+                        {% endif %}
+                    </div>
+
+                    <hr>
+
+                    <!-- Productos Laborales -->
+                    <div class="section mb-4">
+                        <h3 class="text-danger">Productos Laborales</h3>
+                        {% if productos_laborales %}
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Producto</th>
+                                            <th>Fecha</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for prod in productos_laborales %}
+                                            <tr>
+                                                <td>{{ prod.nombreproducto }}</td>
+                                                <td>{{ prod.fechaproducto|date:"d M Y" }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <p class="text-muted">No hay productos laborales registrados.</p>
+                        {% endif %}
+                    </div>
+
+                    <hr>
+
+                    <!-- Ventas Garage -->
+                    <div class="section mb-4">
+                        <h3 class="text-danger">Venta de Productos</h3>
+                        {% if ventas %}
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Producto</th>
+                                            <th>Estado</th>
+                                            <th>Valor</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for venta in ventas %}
+                                            <tr>
+                                                <td>{{ venta.nombreproducto }}</td>
+                                                <td>
+                                                    <span class="badge bg-{% if venta.estadoproducto == 'Bueno' %}success{% else %}warning{% endif %}">
+                                                        {{ venta.estadoproducto }}
+                                                    </span>
+                                                </td>
+                                                <td>${{ venta.valordelbien }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <p class="text-muted">No hay productos en venta.</p>
+                        {% endif %}
+                    </div>
+
+                </div>
+
+                <div class="card-footer">
+                    <a href="{% url 'admin_editar_hoja_vida' usuario.id %}" class="btn btn-primary">
+                        <i class="bi bi-pencil"></i> Editar Datos Personales
+                    </a>
+                    <a href="{% url 'admin_descargar_cv_pdf' usuario.id %}" class="btn btn-danger">
+                        <i class="bi bi-download"></i> Descargar CV
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

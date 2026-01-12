@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-header bg-danger text-white">
+            <h2 class="mb-0">Panel de Administrador - Hojas de Vida</h2>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Usuario</th>
+                            <th>Nombre Completo</th>
+                            <th>Cédula</th>
+                            <th>Estado</th>
+                            <th>Fecha Creación</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for hoja in hojas_vida %}
+                            <tr>
+                                <td><strong>{{ hoja.user.username }}</strong></td>
+                                <td>{{ hoja.nombres }} {{ hoja.apellidos }}</td>
+                                <td>{{ hoja.numerocedula }}</td>
+                                <td>
+                                    {% if hoja.perfilactivo %}
+                                        <span class="badge bg-success">Activo</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Inactivo</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ hoja.fechacreacion|date:"d/m/Y" }}</td>
+                                <td>
+                                    <a href="{% url 'admin_ver_hoja_vida' hoja.user.id %}" class="btn btn-sm btn-primary">
+                                        <i class="bi bi-eye"></i> Ver
+                                    </a>
+                                    <a href="{% url 'admin_editar_hoja_vida' hoja.user.id %}" class="btn btn-sm btn-warning">
+                                        <i class="bi bi-pencil"></i> Editar
+                                    </a>
+                                    <a href="{% url 'admin_descargar_cv_pdf' hoja.user.id %}" class="btn btn-sm btn-success">
+                                        <i class="bi bi-download"></i> Descargar
+                                    </a>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center text-muted">
+                                    No hay hojas de vida registradas
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
